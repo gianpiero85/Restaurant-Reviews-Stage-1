@@ -1,7 +1,8 @@
+/**
+ *     Service Worker registration
+ */
+
 document.addEventListener("DOMContentLoaded", event => {
-  /**
-   *     Service Worker registration
-   */
   if (navigator.serviceWorker) {
     navigator.serviceWorker
       .register("sw.js")

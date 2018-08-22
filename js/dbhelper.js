@@ -1,17 +1,4 @@
-/**
- * serviceWorker Registration.
- */
 
- if ('serviceWorker' in navigator) {
-
-   navigator.serviceWorker.register('./sw.js')
-     .then(function(registration) {
-       console.log('Service Worker Registred', registration);
-     })
-     .catch(function(err) {
-       console.log('Service Worker failed', err);
-     })
- }
 /**
  * Common database helper functions.
  */
