@@ -1,60 +1,57 @@
-const cacheName = 'v1';
-const cacheFiles = [
-  '/js/dbhelper.js',
-  '/js/restaurant_info.js',
-  '/js/main.js',
-  '/css/styles.css',
-  '/data/restaurants.json',
-  '/index.html',
-  '/restaurant.html',
-  './img/1.jpg',
-  './img/2.jpg',
-  './img/3.jpg',
-  './img/4.jpg',
-  './img/5.jpg',
-  './img/6.jpg',
-  './img/7.jpg',
-  './img/8.jpg',
-  './img/9.jpg',
-  './img/10.jpg'
-]
+let cacheName = "v1";
+let cacheFiles = [
+  "./",
+  "./sw_registration.js",
+  "index.html",
+  "restaurant.html",
+  "css/styles.css",
+  "data/restaurants.json",
+  "js/dbhelper.js",
+  "js/main.js",
+  "js/restaurant_info.js",
+  "img/1.jpg",
+  "img/2.jpg",
+  "img/3.jpg",
+  "img/4.jpg",
+  "img/5.jpg",
+  "img/6.jpg",
+  "img/7.jpg",
+  "img/8.jpg",
+  "img/9.jpg",
+  "img/10.jpg"
+];
 
-
-
-self.addEventListener('install', function(e) {
-  console.log('sw install');
-  e.waitUntil(
-    caches.open(cacheName).then(function(cache) {
-      console.log("[sw] Caching cachefiles");
-      return cache.addAll(cacheFiles);
-    })
-  )
-})
-
-self.addEventListener('activate', function(e) {
-  console.log('sw activate');
-  e.waitUntil(
-    caches.keys().then(function(cacheName) {
-      return Promise.all(cacheName.map(function(thisCacheName) {
-        if (thisCacheName !== cacheName && thisCacheName !== cacheFiles) {
-          console.log('[ServiceWorker] Removing old cache');
-          return caches.delete(thisCacheName);
-        }
-      }));
-    })
+self.addEventListener("install", event => {
+   console.log('sw install');
+  event.waitUntil(
+    caches
+      .open(cacheName)
+      .then(cache => cache.addAll(cacheFiles))
+      .then(self.skipWaiting())
   );
 });
 
-
-self.addEventListener('fetch', function(e) {
-  e.respondWith(
-    fetch(e.request).then(function(response) {
-      if (response.status == 404) {
-        return new Response("Page not found");
+self.addEventListener("activate", event => {
+  console.log('sw activate')
+  event.waitUntil(
+    caches.keys().then(CacheNames => Promise.all(CacheNames.map(cache => {
+      if (cache !== cacheName) {
+        console.log("removing cached files from ", cache);
+        return caches.delete(cache);
       }
-      return response;
-    }).catch(function() {
-      return new Response("Page failed");
-    })
-  );
+    })))
+  )
+})
+
+self.addEventListener("fetch", event => {
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      })
+    );
+  }
 });
